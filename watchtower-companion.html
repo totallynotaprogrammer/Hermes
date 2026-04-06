@@ -101,6 +101,8 @@
   .section:nth-child(5) { animation-delay: 0.40s; }
   .section:nth-child(6) { animation-delay: 0.48s; }
   .section:nth-child(7) { animation-delay: 0.56s; }
+  .section:nth-child(8) { animation-delay: 0.64s; }
+  .section:nth-child(9) { animation-delay: 0.72s; }
 
   .section-label {
     font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase;
@@ -126,6 +128,7 @@
   }
   .pull.fort  { border-color: var(--fort);  background: rgba(224,64,251,0.04); color: var(--fort); }
   .pull.amber { border-color: var(--amber); background: rgba(245,166,35,0.04); color: var(--amber); }
+  .pull.cyan  { border-color: var(--cyan);  background: rgba(0,212,255,0.04);  color: var(--cyan); }
 
   .role-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -145,12 +148,39 @@
   .ch-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
   .ch-name { font-family: Georgia, serif; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 5px; }
   .ch-desc { font-size: 10px; color: var(--muted2); line-height: 1.65; }
+  .ch-status { font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px; }
 
   .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 22px 0; }
   .field-item { background: var(--surface); border: 1px solid var(--border); padding: 16px 18px; }
   .field-num  { font-size: 8px; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 6px; }
   .field-name { font-family: Georgia, serif; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px; }
   .field-desc { font-size: 10px; color: var(--muted2); line-height: 1.65; }
+
+  /* Signal log format block */
+  .log-format {
+    background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.18);
+    padding: 18px 22px; margin: 22px 0; font-size: 10px; line-height: 2;
+  }
+  .log-format-label { font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--cyan); margin-bottom: 12px; }
+  .log-field { display: flex; gap: 16px; }
+  .log-key   { color: var(--cyan); flex-shrink: 0; min-width: 130px; }
+  .log-val   { color: var(--muted2); }
+
+  /* Temporal map explanation */
+  .tw-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 22px 0; }
+  .tw-item { background: var(--surface); border: 1px solid var(--border); padding: 14px; position: relative; }
+  .tw-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .tw-item.persistent::before { background: var(--red); }
+  .tw-item.multiday::before   { background: var(--amber); }
+  .tw-item.sameday::before    { background: var(--cyan); }
+  .tw-item.immediate::before  { background: var(--muted); }
+  .tw-name { font-family: Georgia, serif; font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .tw-tag  { font-size: 7px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 8px; }
+  .tw-desc { font-size: 9px; color: var(--muted2); line-height: 1.6; }
+  .tw-item.persistent .tw-tag { color: var(--red); }
+  .tw-item.multiday   .tw-tag { color: var(--amber); }
+  .tw-item.sameday    .tw-tag { color: var(--cyan); }
+  .tw-item.immediate  .tw-tag { color: var(--muted2); }
 
   .protocol-block {
     border: 1px solid rgba(224,64,251,0.2); background: rgba(224,64,251,0.03);
@@ -161,6 +191,17 @@
   .protocol-rule:last-child { margin-bottom: 0; }
   .pn { color: var(--fort); flex-shrink: 0; font-weight: 700; }
 
+  /* W1 scored record */
+  .w1-record {
+    border: 1px solid rgba(224,64,251,0.2); background: rgba(224,64,251,0.03);
+    padding: 16px 20px; margin: 16px 0;
+  }
+  .w1-label  { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fort); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .w1-label span { background: rgba(224,64,251,0.12); border: 1px solid rgba(224,64,251,0.25); padding: 2px 8px; }
+  .w1-text   { font-size: 10px; color: var(--text); line-height: 1.75; margin-bottom: 10px; }
+  .w1-verdict { font-size: 10px; color: var(--fort); border-top: 1px solid rgba(224,64,251,0.15); padding-top: 10px; line-height: 1.7; }
+  .w1-note   { font-size: 9px; color: var(--muted2); margin-top: 8px; line-height: 1.7; }
+
   .warning-block {
     border: 1px solid rgba(255,61,87,0.2); background: rgba(255,61,87,0.03);
     padding: 22px; margin: 22px 0; display: flex; gap: 18px; align-items: flex-start;
@@ -168,6 +209,16 @@
   .wi { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
   .wt { font-family: Georgia, serif; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px; }
   .wd { font-size: 10px; color: var(--muted2); line-height: 1.8; }
+
+  /* Version table */
+  .ver-table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 10px; }
+  .ver-table th { text-align: left; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: normal; }
+  .ver-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--muted2); line-height: 1.6; }
+  .ver-table tr:last-child td { border-bottom: none; }
+  .ver-table td:first-child { color: var(--cyan); white-space: nowrap; }
+  .ver-table td:nth-child(2) { color: var(--muted); white-space: nowrap; }
+  .ver-table tr.current td { background: rgba(0,232,122,0.03); }
+  .ver-table tr.current td:first-child { color: var(--green); }
 
   .closer {
     border-top: 1px solid var(--border); padding-top: 32px; margin-top: 48px;
@@ -199,18 +250,20 @@
       <div class="doc-label">Field Notes &middot; Companion Document</div>
       <h1>The <span>Watchtower</span><br>&mdash; What This Is</h1>
     </div>
-    <div class="doc-type">READER BRIEFING &middot; v2.1</div>
+    <div class="doc-type">READER BRIEFING &middot; v2.3</div>
   </div>
   <div class="header-meta">
     <div>CLASSIFICATION <b>Shareable Framework</b></div>
     <div>CHANNELS <b>5 Active + Fortean</b></div>
-    <div>WORKFLOW <b>ChatGPT &rarr; Human &rarr; Claude</b></div>
+    <div>SENSOR <b>ChatGPT Array &rarr; Human &rarr; Claude</b></div>
+    <div>SCANS <b>Apr 4 + Apr 5 2026</b></div>
     <div>PURPOSE <b>Structural Pattern Detection</b></div>
   </div>
 </header>
 
 <main>
 
+  <!-- 01 OVERVIEW -->
   <div class="section">
     <div class="section-label">01 &mdash; Overview</div>
     <h2>A lens, not an oracle.</h2>
@@ -220,93 +273,134 @@
     <p>This document explains what you are looking at, how it works, and the thinking behind it. The dashboard is the artifact. This is the field notes that go with it.</p>
   </div>
 
+  <!-- 02 FIVE CHANNELS -->
   <div class="section">
     <div class="section-label">02 &mdash; The Five Channels</div>
     <h2>What we're watching.</h2>
-    <p>Each channel tracks a domain where significant structural transition appears to be underway &mdash; not just news cycles, but changes to the underlying architecture of how things work.</p>
+    <p>Each channel tracks a domain where significant structural transition appears to be underway &mdash; not just news cycles, but changes to the underlying architecture of how things work. As of the Apr 4&ndash;5 2026 dual scan, <strong>all five channels are showing persistent signals confirmed across both scan days.</strong></p>
     <div class="channel-list">
       <div class="channel-item">
         <div class="ch-dot" style="background:var(--amber);"></div>
-        <div><div class="ch-name">AI Governance + Biosecurity</div><div class="ch-desc">Tracking the shift from broad policy principles into embedded technical constraints &mdash; traceability, constrained autonomy, and reproducibility becoming engineering requirements, not aspirations.</div></div>
+        <div>
+          <div class="ch-name">AI Governance + Biosecurity</div>
+          <div class="ch-desc">Tracking the shift from broad policy principles into binding, enforceable technical constraints &mdash; traceability, constrained autonomy, and reproducibility becoming engineering requirements. International regulatory alignment (U.S., EU, Asia) now consolidating around model accountability standards.</div>
+          <div class="ch-status" style="color:var(--amber);">Signal: HIGH &mdash; Voluntary frameworks being left behind</div>
+        </div>
       </div>
       <div class="channel-item">
         <div class="ch-dot" style="background:var(--green);"></div>
-        <div><div class="ch-name">AI-Native Biotech</div><div class="ch-desc">Watching the move from isolated AI-assisted discoveries to continuous AI-driven development platforms. The platform is becoming the product. Repeatability and scalability are now the differentiators.</div></div>
+        <div>
+          <div class="ch-name">AI-Native Biotech</div>
+          <div class="ch-desc">Watching the move from isolated AI-assisted discoveries to continuous AI-operated development pipelines. Pharma is no longer experimenting with AI &mdash; it is outsourcing core discovery to AI-native systems. In silico biology now designing and filtering compounds almost entirely computationally before lab validation.</div>
+          <div class="ch-status" style="color:var(--green);">Signal: HIGH &mdash; Development cycles resembling software engineering</div>
+        </div>
       </div>
       <div class="channel-item">
         <div class="ch-dot" style="background:var(--cyan);"></div>
-        <div><div class="ch-name">Emerging Tech Convergence</div><div class="ch-desc">Tracking the tight coupling of AI + biotech + automation stacks. Closed-loop systems &mdash; design, test, optimize &mdash; with minimal human intervention becoming a design goal rather than a risk.</div></div>
+        <div>
+          <div class="ch-name">Emerging Tech Convergence</div>
+          <div class="ch-desc">Tracking the tight coupling of AI, biotech, robotics, and advanced materials into unified closed-loop R&D ecosystems. Autonomous research systems: AI agents design experiments, robotic labs execute them, feedback loops refine outcomes continuously. Human-led experimentation phases are becoming optional.</div>
+          <div class="ch-status" style="color:var(--cyan);">Signal: HIGH &mdash; Four-domain convergence confirmed in single Apr 5 scan</div>
+        </div>
       </div>
       <div class="channel-item">
         <div class="ch-dot" style="background:var(--green);"></div>
-        <div><div class="ch-name">Psychedelic Research</div><div class="ch-desc">The field is splitting structurally &mdash; regulated clinical therapeutics on one track, engineered non-hallucinogenic neuroactive compounds on another. Two increasingly distinct industries, not one field.</div></div>
+        <div>
+          <div class="ch-name">Psychedelic Research</div>
+          <div class="ch-desc">The field has split structurally &mdash; regulated clinical therapeutics on one track, engineered non-hallucinogenic neuroactive compounds on another. These are two distinct industries with separate funding, timelines, and endpoints. Institutional involvement (health systems, insurers) now preparing for scaled rollout.</div>
+          <div class="ch-status" style="color:var(--green);">Signal: HIGH &mdash; Bifurcation locked, both tracks advancing independently</div>
+        </div>
       </div>
       <div class="channel-item">
         <div class="ch-dot" style="background:var(--blue);"></div>
-        <div><div class="ch-name">Neuro + Mental Health Tech</div><div class="ch-desc">Three parallel treatment modality tracks: neuroplastogens, brain-interface therapies, and glymphatic/sleep-based systems. Watching for the moment the psychedelic divergence feeds directly into this channel.</div></div>
+        <div>
+          <div class="ch-name">Neuro + Mental Health Tech</div>
+          <div class="ch-desc">Three parallel treatment modality tracks: neuroplastogens, brain-interface therapies, and glymphatic/sleep-based systems. The psychedelic Track 2 (non-hallucinogenic compounds) is now actively cross-loading into this channel &mdash; the bifurcation in the psych domain is feeding directly here.</div>
+          <div class="ch-status" style="color:var(--blue);">Signal: MED&ndash;HIGH &mdash; Elevated by psych Track 2 cross-load</div>
+        </div>
       </div>
     </div>
-    <p>A sixth parallel channel &mdash; <strong style="color:var(--fort);">Fortean Anomalies</strong> &mdash; runs on entirely different rules. See Section 05.</p>
+    <p>A sixth parallel channel &mdash; <strong style="color:var(--fort);">Fortean Anomalies</strong> &mdash; runs on entirely different rules. See Section 06.</p>
   </div>
 
+  <!-- 03 PIPELINE -->
   <div class="section">
     <div class="section-label">03 &mdash; How It Works</div>
-    <h2>Three roles. One pipeline.</h2>
-    <p>The system runs on a deliberate three-way workflow. Each role is distinct and not substitutable by the others:</p>
+    <h2>Three nodes. One pipeline.</h2>
+    <p>The system runs on a deliberate three-node workflow. Each node is distinct and not substitutable by the others. The pipeline is named: the <strong style="color:var(--cyan);">ChatGPT Sensor Array</strong>.</p>
     <div class="role-grid">
       <div class="role-cell">
         <span class="role-icon">&#9881;</span>
         <div class="role-name">ChatGPT</div>
         <span class="role-tag" style="color:var(--cyan);">Signal Generation</span>
-        <div class="role-desc">Runs pattern detection scans across domains. Formats output into a structured log with six fields. Generates the raw signal data that enters the pipeline.</div>
+        <div class="role-desc">Runs pattern detection scans across monitored domains. Formats every output into a structured six-field log entry. Generates the raw signal data that enters the pipeline. Operates on a scan-by-scan basis &mdash; each scan is a discrete input event.</div>
       </div>
       <div class="role-cell" style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
         <span class="role-icon">&#128205;</span>
         <div class="role-name">Human Curator</div>
         <span class="role-tag" style="color:var(--green);">Judgment Layer</span>
-        <div class="role-desc">The irreplaceable component. Decides what clears the bar, what gets logged, what gets elevated to a watch item, what gets discarded. No AI substitutes for this.</div>
+        <div class="role-desc">The irreplaceable node. Decides what clears the bar, what gets logged, what gets elevated to a watch item, what gets discarded. Sets the editorial standard. No AI substitutes for this. The system is only as good as the judgment applied here.</div>
       </div>
       <div class="role-cell">
         <span class="role-icon">&#128225;</span>
         <div class="role-name">Claude</div>
         <span class="role-tag" style="color:var(--purple);">Visualization</span>
-        <div class="role-desc">Translates curated signals into the dashboard interface. Builds iteratively &mdash; new signals come in, cards update, delta badges shift, patterns deepen.</div>
+        <div class="role-desc">Translates curated signals into the dashboard interface. Builds iteratively &mdash; new signals come in, cards update, delta badges shift, patterns deepen. The dashboard file evolves rather than being replaced.</div>
       </div>
     </div>
-    <p>The signal log uses <strong>six fields</strong>: Timestamp, Event, Category, Signal Strength, Time Window Tag, and Notes. The Time Window Tag is the key structural piece &mdash; it classifies signals as Immediate, Same-day, Multi-day, or Persistent, enabling behavioral pattern detection over time rather than isolated snapshots.</p>
   </div>
 
+  <!-- 04 SIGNAL FORMAT -->
   <div class="section">
-    <div class="section-label">04 &mdash; Reading the Dashboard</div>
-    <h2>What the interface is telling you.</h2>
-    <p>Each domain card contains four layers of information:</p>
-    <div class="field-grid">
-      <div class="field-item">
-        <div class="field-num">LAYER 01</div>
-        <div class="field-name">Signal Meter</div>
-        <div class="field-desc">The bar graph in the top-right of each card. Visual shorthand for current activity level &mdash; Low, Medium, Med-High, or High.</div>
+    <div class="section-label">04 &mdash; The Signal Log Format</div>
+    <h2>What a signal looks like.</h2>
+    <p>Every signal entering the pipeline follows a locked six-field format. This is what ChatGPT generates; this is what the curator evaluates; this is what Claude receives to build from. The format is the contract between all three nodes.</p>
+    <div class="log-format">
+      <div class="log-format-label">&#9711; Locked Signal Format &mdash; v2.2+</div>
+      <div class="log-field"><span class="log-key">Timestamp:</span>     <span class="log-val">YYYY-MM-DD HH:MM TZ</span></div>
+      <div class="log-field"><span class="log-key">Event:</span>         <span class="log-val">[what happened, one sentence]</span></div>
+      <div class="log-field"><span class="log-key">Category:</span>      <span class="log-val">Infrastructure / Aviation / Environmental / Tech / Fortean / Narrative</span></div>
+      <div class="log-field"><span class="log-key">Signal Strength:</span><span class="log-val">Low / Medium / High</span></div>
+      <div class="log-field"><span class="log-key">Time Window Tag:</span><span class="log-val">Immediate / Same-day / Multi-day / Persistent</span></div>
+      <div class="log-field"><span class="log-key">Notes:</span>         <span class="log-val">1&ndash;3 lines &mdash; what matters, why it matters</span></div>
+    </div>
+    <p>The <strong>Time Window Tag</strong> is the system's temporal axis &mdash; the upgrade that changed the Watchtower from a snapshot tool into a behavioral pattern tracker. It tells you not just <em>what</em> a signal is, but <em>how it is behaving over time.</em></p>
+    <div class="pull cyan">"Before: is this weird? Now: how is this behaving over time? That's the difference between signal tracking and intelligence analysis."</div>
+  </div>
+
+  <!-- 05 TEMPORAL MAP -->
+  <div class="section">
+    <div class="section-label">05 &mdash; The Temporal Activity Map</div>
+    <h2>Three axes: what, how strong, how long.</h2>
+    <p>The Temporal Activity Map is a four-column panel in the dashboard that distributes every active signal by its Time Window Tag. It makes behavioral pattern visible at a glance &mdash; how many signals are isolated spikes versus ongoing structural shifts.</p>
+    <div class="tw-grid">
+      <div class="tw-item persistent">
+        <div class="tw-name">Persistent</div>
+        <div class="tw-tag">Ongoing &middot; Highest signal</div>
+        <div class="tw-desc">Confirmed across multiple scans. Pattern locked. These are the structural shifts. Watch for escalation toward trigger conditions.</div>
       </div>
-      <div class="field-item">
-        <div class="field-num">LAYER 02</div>
-        <div class="field-name">Delta Badge</div>
-        <div class="field-desc">The small colored tag below the card header. Shows directional change from the last update: accelerating, stable, new signal, diverging, or watch item active.</div>
+      <div class="tw-item multiday">
+        <div class="tw-name">Multi-Day</div>
+        <div class="tw-tag">Recurring &middot; Pattern forming</div>
+        <div class="tw-desc">Events appearing over multiple days. Not yet persistent. Watch to see if this column feeds into Persistent on the next scan.</div>
       </div>
-      <div class="field-item">
-        <div class="field-num">LAYER 03</div>
-        <div class="field-name">Pattern Statement</div>
-        <div class="field-desc">The italic block. One sentence capturing the structural read on the domain &mdash; not an event summary, but the interpretive frame for everything below it.</div>
+      <div class="tw-item sameday">
+        <div class="tw-name">Same-Day</div>
+        <div class="tw-tag">Clustering &middot; Early signal</div>
+        <div class="tw-desc">Multiple events within one scan window. Early clustering. Could be noise. Could be the beginning of a multi-day pattern.</div>
       </div>
-      <div class="field-item">
-        <div class="field-num">LAYER 04</div>
-        <div class="field-name">Signal Bullets</div>
-        <div class="field-desc">Specific observations supporting the pattern statement. Curated &mdash; not every signal that came in, only the ones that cleared the bar.</div>
+      <div class="tw-item immediate">
+        <div class="tw-name">Immediate</div>
+        <div class="tw-tag">Isolated &middot; Often noise</div>
+        <div class="tw-desc">Single spikes. Significant only if they repeat. Watch items (like Fortean entries) typically land here until scored.</div>
       </div>
     </div>
-    <p>The <strong>Synthesis panel</strong> pulls cross-domain threads into first, second, and third-order structural patterns. The <strong>Trigger panel</strong> defines three escalation conditions &mdash; if all three fire, it signals full convergence into a single regulated system layer. The <strong>Phase Bar</strong> marks the overall arc: currently Phase 03 &mdash; Structural Transition.</p>
+    <p>As of the Apr 4&ndash;5 dual scan: <strong>all five main channels are Persistent</strong>. Same-Day has two entries (Emtech and Psych clustering in the Apr 5 scan). Immediate holds the now-closed Fortean W1 watch item. This distribution &mdash; heavy on Persistent, light on noise &mdash; is a strong signal state.</p>
   </div>
 
+  <!-- 06 FORTEAN -->
   <div class="section">
-    <div class="section-label">05 &mdash; The Fortean Channel</div>
+    <div class="section-label">06 &mdash; The Fortean Channel</div>
     <h2>Pattern, not truth.</h2>
     <p>The Fortean Anomaly Monitor is architecturally separate from the other five channels. It runs on a different color language (magenta/purple), a different layout, and a different epistemological standard.</p>
     <div class="pull fort">"Keep the data &mdash; especially the data that doesn't fit." &mdash; Charles Fort</div>
@@ -318,40 +412,125 @@
       <div class="protocol-rule"><div class="pn">03</div><div>Time-bound falsifiable claims are logged as watch items with hard expiry dates. After resolution they are scored: Falsified / Partially Met / Unresolved / Unfalsifiable by Design.</div></div>
       <div class="protocol-rule"><div class="pn">04</div><div>Flag when Fortean topics enter mainstream discourse. Narrative drift &mdash; the movement of fringe categories into institutional language &mdash; is itself a trackable signal.</div></div>
     </div>
-    <p>The discipline here is important. The channel exists because anomalous data has historically preceded paradigm shifts. But without rigorous sourcing and falsification standards, it collapses into noise. The protocol is what keeps it useful.</p>
+
+    <p>The first watch item, W1, has now been scored.</p>
+
+    <div class="w1-record">
+      <div class="w1-label">W1 &mdash; Closed &middot; Scored <span>APR 5 2026</span></div>
+      <div class="w1-text">
+        <strong style="color:#fff;">Bledsoe Easter 2026 Prediction</strong> &mdash; Chris Bledsoe (multi-witness 2007 UAP case, with documented CIA officer attention) via a single Threads post. Prediction allegedly from 2012: orbs rising from oceans, an Iran&ndash;Israel conflict trigger, and a Regulus/Sphinx astronomical alignment, all converging on the Easter 2026 window. Logged as a single-source watch item; did not clear the multi-witness bar for full logging.
+      </div>
+      <div class="w1-verdict">
+        VERDICT: <strong>UNRESOLVED</strong> &mdash; Window elapsed Apr 5 2026. Specific claims did not produce observable confirmation. Neither falsified nor confirmed. Scored inconclusive.
+      </div>
+      <div class="w1-note">
+        Note: The underlying Bledsoe case retains independent cross-source weight separate from this prediction's outcome. Former CIA Senior Intelligence Officer Jim Semivan's public vouching for Bledsoe constitutes anomalous institutional behavior worth carrying forward as a distinct data point, unconnected to W1's resolution. Channel reset. Awaiting next qualifying event.
+      </div>
+    </div>
   </div>
 
+  <!-- 07 READING THE DASHBOARD -->
   <div class="section">
-    <div class="section-label">06 &mdash; The Standing Caution</div>
-    <h2>The palantir problem.</h2>
+    <div class="section-label">07 &mdash; Reading the Dashboard</div>
+    <h2>What the interface is telling you.</h2>
+    <p>Each domain card contains four layers of information:</p>
+    <div class="field-grid">
+      <div class="field-item">
+        <div class="field-num">LAYER 01</div>
+        <div class="field-name">Signal Meter</div>
+        <div class="field-desc">The bar graph in the top-right of each card. Visual shorthand for current activity level &mdash; Low, Medium, Med-High, or High. Bars increase in height left to right; filled bars indicate active signal.</div>
+      </div>
+      <div class="field-item">
+        <div class="field-num">LAYER 02</div>
+        <div class="field-name">Delta Badge</div>
+        <div class="field-desc">The colored tag below the card header. Shows directional change from the prior scan: accelerating, stable, new signal, diverging, confirmed, or watch item active. Two-scan confirmation produces the strongest badge state.</div>
+      </div>
+      <div class="field-item">
+        <div class="field-num">LAYER 03</div>
+        <div class="field-name">Pattern Statement</div>
+        <div class="field-desc">The italic block. One sentence capturing the structural read on the domain &mdash; not an event summary, but the interpretive frame for everything below it. This is the synthesis, not the data.</div>
+      </div>
+      <div class="field-item">
+        <div class="field-num">LAYER 04</div>
+        <div class="field-name">Signal Bullets</div>
+        <div class="field-desc">Specific observations supporting the pattern statement, organized by scan date where multiple scans exist. Curated &mdash; not every signal that came in, only what cleared the bar.</div>
+      </div>
+    </div>
+    <p>The <strong>Synthesis panel</strong> pulls cross-domain threads into first, second, and third-order structural patterns. The <strong>Trigger panel</strong> defines three escalation conditions. The <strong>Phase Bar</strong> marks the overall arc: currently Phase 03 &mdash; Structural Transition. Triggers T1 and T2 are closing as of the Apr 4&ndash;5 scans.</p>
+  </div>
+
+  <!-- 08 PALANTIR CAUTION -->
+  <div class="section">
+    <div class="section-label">08 &mdash; The Standing Caution</div>
+    <h2>The palant&iacute;r problem.</h2>
     <div class="warning-block">
       <div class="wi">&#128302;</div>
       <div>
         <div class="wt">True things in misleading contexts.</div>
         <div class="wd">
-          In Tolkien's mythology, the palantiri were seeing-stones &mdash; each capable of showing true things happening far away. The problem was not that they lied. The problem was that they showed true things in misleading contexts, selectively, in ways that could be weaponized. Sauron didn't falsify what Denethor saw. He just controlled the framing.
+          In Tolkien's mythology, the palant&iacute;ri were seeing-stones &mdash; each capable of showing true things happening far away. The problem was not that they lied. The problem was that they showed true things in misleading contexts, selectively, in ways that could be weaponized. Sauron didn't falsify what Denethor saw. He just controlled the framing.
           <br><br>
           Any signal intelligence system has this vulnerability. The signals can be real. The pattern can be genuine. And the interpretation can still be badly wrong &mdash; because framing, selection bias, and confirmation loops are not visible in the data itself.
           <br><br>
-          This is the standing caution for the Watchtower. It is a lens. It is not an oracle. The human judgment layer is not a feature &mdash; it is the system's primary defense against the palantir problem.
+          This is the standing caution for the Watchtower. It is a lens. It is not an oracle. The human judgment layer is not a feature &mdash; it is the system's primary defense against the palant&iacute;r problem. The silence is also load-bearing: long quiet periods are what give the signal its meaning when it arrives.
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 09 HOW TO USE + VERSION HISTORY -->
   <div class="section">
-    <div class="section-label">07 &mdash; How to Use This</div>
+    <div class="section-label">09 &mdash; How to Use This</div>
     <h2>A framework, not a conclusion.</h2>
     <p>The Watchtower is shared as a <strong>lens and a template</strong> &mdash; not as a set of conclusions to agree or disagree with. The specific domains tracked reflect one curator's judgment about where structural transitions are underway. Your domains might be different. Your falsification standards for the Fortean channel might be stricter or more permissive. The architecture is the point, not the content.</p>
     <div class="pull amber">"The system is optimized for significance over frequency. Long periods of quiet are expected and appropriate. The goal is meaningful signals &mdash; not volume."</div>
-    <p>What the system offers at its best: a structured way to notice things that are changing slowly enough to be invisible in daily news consumption, but fast enough that they will be obviously significant in retrospect. The dashboard makes the patterns visible. What you do with them is yours.</p>
-    <p>The HTML file is self-contained. It requires no server, no login, no dependencies beyond a browser. Open it, read it, adapt the architecture for your own domains if you want to. The system is designed to be rebuilt.</p>
+    <p>The HTML file is self-contained. No server, no login, no dependencies beyond a browser. Open it, read it, adapt the architecture for your own domains. The system is designed to be rebuilt.</p>
+
+    <p style="margin-top:28px;"><strong>Version history:</strong></p>
+    <table class="ver-table">
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Date</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v1.0</td>
+          <td>Mar 2026</td>
+          <td>Initial dashboard &mdash; four channels, basic signal cards</td>
+        </tr>
+        <tr>
+          <td>v2.0</td>
+          <td>Mar 2026</td>
+          <td>Fortean channel added, phase tracker, synthesis layer, escalation triggers</td>
+        </tr>
+        <tr>
+          <td>v2.1</td>
+          <td>Apr 2026</td>
+          <td>Emtech split out as dedicated channel, delta badges, pattern quotes, signal meters</td>
+        </tr>
+        <tr>
+          <td>v2.2</td>
+          <td>Apr 2026</td>
+          <td>ChatGPT Sensor Array attribution, Temporal Activity Map, locked signal log format</td>
+        </tr>
+        <tr class="current">
+          <td>v2.3</td>
+          <td>Apr 2026</td>
+          <td>Dual-scan integration (Apr 4+5), all channels confirmed persistent, W1 scored UNRESOLVED, T1+T2 triggers closing</td>
+        </tr>
+      </tbody>
+    </table>
+
     <div class="closer">
       <div><p>Questions, observations, or anomalous data worth discussing:<br>bring them. The curation layer welcomes input.</p></div>
       <div class="closer-sig">
         <strong>&mdash; THE WATCHTOWER</strong>
-        Signal Intelligence &middot; v2.1<br>
-        Cross-Domain Scan &middot; Structural Transition Phase
+        Signal Intelligence &middot; v2.3<br>
+        ChatGPT Sensor Array &middot; Apr 4&ndash;5 2026<br>
+        Structural Transition Phase &middot; W1 Closed
       </div>
     </div>
   </div>
@@ -359,8 +538,8 @@
 </main>
 
 <footer>
-  <div>WATCHTOWER COMPANION DOC &middot; FIELD NOTES</div>
-  <div>FOR USE WITH watchtower-v2.1.html</div>
+  <div>WATCHTOWER COMPANION DOC &middot; FIELD NOTES &middot; v2.3</div>
+  <div>FOR USE WITH watchtower-v2.3.html</div>
   <div id="clock">&mdash;</div>
 </footer>
 

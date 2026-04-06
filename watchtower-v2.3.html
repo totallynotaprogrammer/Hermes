@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Watchtower — Signal Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #07090c;
+    --surface: #0b0f14;
+    --surface2: #0f1419;
+    --border: #1a2433;
+    --border2: #243040;
+    --green: #00e87a;
+    --amber: #f5a623;
+    --red: #ff3d57;
+    --blue: #2196f3;
+    --purple: #b06cff;
+    --cyan: #00d4ff;
+    --fort: #e040fb;
+    --text: #c8d8e8;
+    --muted: #3d5468;
+    --muted2: #5a7080;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none; z-index: 99; opacity: 0.4;
+  }
+
+  .ambient {
+    position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 500px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,232,122,0.04) 0%, rgba(33,150,243,0.03) 40%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .scanlines {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+    pointer-events: none; z-index: 98;
+  }
+
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(7,9,12,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    height: 64px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .tower-mark {
+    position: relative; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tower-mark::before, .tower-mark::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--green);
+  }
+  .tower-mark::before { opacity: 0.3; transform: scale(1.4); animation: ripple 2.5s ease-in-out infinite; }
+  .tower-mark::after  { opacity: 0.1; transform: scale(1.8); animation: ripple 2.5s ease-in-out 0.8s infinite; }
+  .tower-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: breathe 2.5s ease-in-out infinite; z-index: 1; }
+
+  .logo-text h1 { font-size: 13px; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #fff; line-height: 1; }
+  .logo-text p  { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted2); letter-spacing: 0.15em; margin-top: 3px; }
+
+  .header-nav { display: flex; align-items: center; gap: 4px; }
+  .nav-pill {
+    font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--border2);
+    color: var(--muted2); background: transparent;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .live-indicator { display: flex; align-items: center; gap: 7px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: var(--green); }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.4s ease-in-out infinite; }
+  .clock { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  main { padding: 28px 32px; max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .update-banner {
+    background: rgba(0,232,122,0.05);
+    border: 1px solid rgba(0,232,122,0.2);
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .update-banner-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; animation: blink 1.4s ease-in-out infinite; }
+  .update-banner p { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--green); letter-spacing: 0.1em; }
+  .update-banner span { color: var(--muted2); }
+
+  /* Dual-scan badge */
+  .dual-scan {
+    display: flex; gap: 1px; margin-bottom: 16px;
+    border: 1px solid var(--border2);
+    animation: fadeUp 0.5s ease 0.04s both;
+  }
+  .scan-day {
+    flex: 1; padding: 8px 16px; background: var(--surface);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .scan-day.active { background: rgba(0,232,122,0.04); }
+  .scan-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .scan-day.active .scan-dot { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  .scan-day:not(.active) .scan-dot { background: var(--muted); }
+  .scan-info { font-family: 'Space Mono', monospace; font-size: 9px; }
+  .scan-date { color: var(--text); letter-spacing: 0.1em; }
+  .scan-status { font-size: 8px; color: var(--muted2); margin-top: 2px; letter-spacing: 0.08em; }
+  .scan-day.active .scan-status { color: var(--green); }
+
+  /* Sensor bar */
+  .sensor-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid var(--border2); background: rgba(33,150,243,0.03);
+    padding: 8px 18px; margin-bottom: 20px;
+    animation: fadeUp 0.5s ease 0.05s both;
+  }
+  .sensor-left { display: flex; align-items: center; gap: 10px; }
+  .sensor-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .sensor-name { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--cyan); letter-spacing: 0.1em; }
+  .sensor-nodes { display: flex; align-items: center; gap: 14px; }
+  .sensor-node { display: flex; align-items: center; gap: 6px; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted2); }
+  .sensor-node-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .node-gpt    { background: var(--cyan);   box-shadow: 0 0 6px var(--cyan);   animation: blink 2s ease-in-out infinite; }
+  .node-will   { background: var(--amber);  box-shadow: 0 0 6px var(--amber); }
+  .node-claude { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+  .sensor-format { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted); letter-spacing: 0.1em; }
+
+  /* Status strip */
+  .status-strip {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--border); background: var(--border);
+    gap: 1px; margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .stat-cell { background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 5px; }
+  .stat-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .stat-val { font-size: 26px; font-weight: 800; line-height: 1; }
+  .stat-sub { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted2); }
+  .d-up   { color: var(--green); font-size: 9px; font-family: 'Space Mono', monospace; }
+  .d-same { color: var(--muted); font-size: 9px; font-family: 'Space Mono', monospace; }
+  .d-warn { color: var(--amber); font-size: 9px; font-family: 'Space Mono', monospace; }
+  .d-fort { color: var(--fort);  font-size: 9px; font-family: 'Space Mono', monospace; }
+
+  /* Phase bar */
+  .phase-bar {
+    display: flex; border: 1px solid var(--border); margin-bottom: 24px; overflow: hidden;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+  .phase-step {
+    flex: 1; padding: 12px 14px; background: var(--surface);
+    text-align: center; border-right: 1px solid var(--border); position: relative;
+  }
+  .phase-step:last-child { border-right: none; }
+  .phase-step.current { background: rgba(0,232,122,0.05); }
+  .phase-step.current::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--green); }
+  .phase-num  { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 3px; }
+  .phase-name { font-size: 12px; font-weight: 600; color: var(--muted2); }
+  .phase-step.current .phase-name { color: #fff; }
+  .phase-step.current .phase-num  { color: var(--green); }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+      "gov bio emtech"
+      "psych psych neuro"
+      "fort fort fort"
+      "temporal temporal temporal"
+      "synth synth synth"
+      "trigger trigger trigger";
+    gap: 14px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 22px; position: relative; overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+  }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+
+  .card.gov      { grid-area: gov;      animation-delay: 0.20s; }
+  .card.bio      { grid-area: bio;      animation-delay: 0.28s; }
+  .card.emtech   { grid-area: emtech;   animation-delay: 0.36s; }
+  .card.psych    { grid-area: psych;    animation-delay: 0.44s; }
+  .card.neuro    { grid-area: neuro;    animation-delay: 0.44s; }
+  .card.fort     { grid-area: fort;     animation-delay: 0.52s; }
+  .card.temporal { grid-area: temporal; animation-delay: 0.58s; }
+  .card.synth    { grid-area: synth;    animation-delay: 0.60s; }
+  .card.trigger  { grid-area: trigger;  animation-delay: 0.68s; }
+
+  .sig-high::before     { background: var(--green); }
+  .sig-medhigh::before  { background: var(--amber); }
+  .sig-medium::before   { background: var(--blue); }
+  .sig-emtech::before   { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+  .sig-fort::before     { background: linear-gradient(90deg, var(--fort), var(--purple)); }
+  .sig-synth::before    { background: linear-gradient(90deg, var(--blue), var(--purple), var(--green)); }
+  .sig-trigger::before  { background: var(--red); }
+  .sig-temporal::before { background: linear-gradient(90deg, var(--cyan), var(--green)); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .card-id  { display: flex; align-items: center; gap: 10px; }
+  .card-icon { font-size: 22px; line-height: 1; }
+  .card-name { font-size: 14px; font-weight: 800; color: #fff; }
+  .card-sub  { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted2); letter-spacing: 0.1em; margin-top: 2px; }
+
+  .meter { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .meter-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.12em; color: var(--muted); }
+  .bars { display: flex; align-items: flex-end; gap: 2px; }
+  .b { width: 4px; border-radius: 1px; background: var(--border2); }
+  .b.on { box-shadow: 0 0 5px currentColor; }
+  .b.green { background: var(--green); color: var(--green); }
+  .b.amber { background: var(--amber); color: var(--amber); }
+  .b.blue  { background: var(--blue);  color: var(--blue);  }
+  .b.cyan  { background: var(--cyan);  color: var(--cyan);  }
+  .b.fort  { background: var(--fort);  color: var(--fort);  }
+
+  .meter-val { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.1em; }
+
+  /* Delta badges */
+  .delta {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'Space Mono', monospace; font-size: 9px; padding: 3px 8px;
+    border: 1px solid; margin-bottom: 12px; letter-spacing: 0.08em;
+  }
+  .delta.up      { color: var(--green); border-color: rgba(0,232,122,0.3);  background: rgba(0,232,122,0.05); }
+  .delta.same    { color: var(--muted2); border-color: var(--border);        background: transparent; }
+  .delta.shift   { color: var(--cyan);  border-color: rgba(0,212,255,0.3);  background: rgba(0,212,255,0.05); }
+  .delta.confirm { color: var(--green); border-color: rgba(0,232,122,0.4);  background: rgba(0,232,122,0.08); }
+  .delta.watch   { color: var(--amber); border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.05); }
+  .delta.score   { color: var(--fort);  border-color: rgba(224,64,251,0.4); background: rgba(224,64,251,0.07); }
+
+  /* Scan-day annotation on signals */
+  .sig-day {
+    font-family: 'Space Mono', monospace; font-size: 7px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 2px 6px; border: 1px solid var(--border2);
+    color: var(--muted); display: inline-block; margin-bottom: 8px;
+  }
+  .sig-day.today { border-color: rgba(0,232,122,0.25); color: var(--green); background: rgba(0,232,122,0.04); }
+  .sig-day.yesterday { border-color: var(--border2); color: var(--muted2); }
+
+  .pattern {
+    border-left: 2px solid; padding: 9px 13px; margin-bottom: 14px;
+    font-family: 'Space Mono', monospace; font-size: 10px; line-height: 1.65;
+    font-style: italic; color: var(--text); background: rgba(0,0,0,0.25);
+  }
+  .sig-high .pattern    { border-color: var(--green); }
+  .sig-medhigh .pattern { border-color: var(--amber); }
+  .sig-medium .pattern  { border-color: var(--blue); }
+  .sig-emtech .pattern  { border-color: var(--cyan); }
+  .sig-fort .pattern    { border-color: var(--fort); }
+
+  .sigs { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sigs li {
+    display: flex; gap: 9px; font-family: 'Space Mono', monospace;
+    font-size: 10px; line-height: 1.55; color: var(--text);
+  }
+  .sigs li::before { content: '—'; color: var(--muted); flex-shrink: 0; }
+  .sigs li.new-today { color: #fff; }
+  .sigs li.new-today::before { content: '↑'; color: var(--green); }
+
+  .sig-section-label {
+    font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin: 10px 0 6px 0;
+    padding-bottom: 4px; border-bottom: 1px solid var(--border);
+  }
+
+  .cdiv { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* Fortean */
+  .card.fort { border-color: rgba(224,64,251,0.2); }
+  .fort-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fort-col-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+  .fort-protocol { background: rgba(224,64,251,0.05); border: 1px solid rgba(224,64,251,0.15); padding: 10px 14px; margin-top: 14px; }
+  .fort-protocol-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fort); margin-bottom: 7px; }
+  .fort-rule { display: flex; gap: 8px; font-family: 'Space Mono', monospace; font-size: 10px; line-height: 1.5; margin-bottom: 5px; }
+  .fort-rule span { color: var(--fort); flex-shrink: 0; }
+  .fort-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .fort-tag { font-family: 'Space Mono', monospace; font-size: 9px; padding: 3px 8px; border: 1px solid rgba(224,64,251,0.2); color: var(--fort); letter-spacing: 0.08em; }
+
+  /* W1 scored */
+  .watch-scored {
+    background: rgba(224,64,251,0.05); border: 1px solid rgba(224,64,251,0.25);
+    padding: 12px 16px; margin-top: 14px;
+  }
+  .watch-scored-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fort); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .watch-scored-label span { background: rgba(224,64,251,0.15); padding: 2px 8px; border: 1px solid rgba(224,64,251,0.3); }
+  .watch-scored-entry { font-family: 'Space Mono', monospace; font-size: 10px; line-height: 1.7; color: var(--text); }
+  .watch-scored-verdict {
+    margin-top: 10px; padding: 8px 12px;
+    border: 1px solid rgba(224,64,251,0.2); background: rgba(224,64,251,0.04);
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--fort);
+    letter-spacing: 0.06em; line-height: 1.6;
+  }
+  .watch-scored-note { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted2); margin-top: 8px; line-height: 1.6; }
+
+  /* Synthesis */
+  .card.synth { border-color: rgba(33,150,243,0.2); }
+  .synth-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .synth-col h4 { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .order { display: flex; gap: 12px; margin-bottom: 12px; }
+  .order-n { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; opacity: 0.12; line-height: 1; }
+  .order-t { font-weight: 800; font-size: 12px; color: #fff; margin-bottom: 4px; }
+  .order-d { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); line-height: 1.55; }
+
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+  .meta-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border2); padding: 12px 14px; }
+  .meta-num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; opacity: 0.15; line-height: 1; margin-bottom: 6px; }
+  .meta-title { font-weight: 800; font-size: 12px; color: #fff; margin-bottom: 5px; }
+  .meta-desc { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted2); line-height: 1.55; }
+
+  /* Temporal */
+  .card.temporal { border-color: rgba(0,212,255,0.15); }
+  .temporal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 4px; }
+  .tw-col { display: flex; flex-direction: column; }
+  .tw-header { padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+  .tw-header-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .tw-header-title { font-size: 11px; font-weight: 800; color: #fff; }
+  .tw-header-desc { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted2); line-height: 1.4; }
+  .tw-col.persistent .tw-header { border-left: 2px solid var(--red); }
+  .tw-col.multiday   .tw-header { border-left: 2px solid var(--amber); }
+  .tw-col.sameday    .tw-header { border-left: 2px solid var(--cyan); }
+  .tw-col.immediate  .tw-header { border-left: 2px solid var(--muted); }
+  .tw-signals { display: flex; flex-direction: column; gap: 6px; padding: 0 2px; }
+  .tw-signal { padding: 8px 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); position: relative; }
+  .tw-signal::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 2px; }
+  .tw-sig-cat { font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px; }
+  .tw-sig-event { font-family: 'Space Mono', monospace; font-size: 9px; line-height: 1.5; color: var(--text); }
+  .tw-sig-meta { display: flex; gap: 8px; margin-top: 5px; font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted2); flex-wrap: wrap; }
+  .tw-sig-strength { padding: 1px 5px; border: 1px solid; font-size: 7px; letter-spacing: 0.1em; }
+  .tw-window-tag { padding: 1px 5px; font-size: 7px; letter-spacing: 0.08em; border: 1px solid var(--border2); color: var(--muted); }
+
+  .tw-signal.gov::before    { background: var(--amber); }
+  .tw-signal.bio::before    { background: var(--green); }
+  .tw-signal.emtech::before { background: var(--cyan);  }
+  .tw-signal.psych::before  { background: var(--green); }
+  .tw-signal.neuro::before  { background: var(--blue);  }
+  .tw-signal.fort::before   { background: var(--fort);  }
+
+  .tw-sig-cat.gov    { color: var(--amber); }
+  .tw-sig-cat.bio    { color: var(--green); }
+  .tw-sig-cat.emtech { color: var(--cyan);  }
+  .tw-sig-cat.psych  { color: var(--green); }
+  .tw-sig-cat.neuro  { color: var(--blue);  }
+  .tw-sig-cat.fort   { color: var(--fort);  }
+
+  .tw-sig-strength.gov    { color: var(--amber); border-color: rgba(245,166,35,0.3); }
+  .tw-sig-strength.bio    { color: var(--green); border-color: rgba(0,232,122,0.3);  }
+  .tw-sig-strength.emtech { color: var(--cyan);  border-color: rgba(0,212,255,0.3);  }
+  .tw-sig-strength.psych  { color: var(--green); border-color: rgba(0,232,122,0.3);  }
+  .tw-sig-strength.neuro  { color: var(--blue);  border-color: rgba(33,150,243,0.3); }
+  .tw-sig-strength.fort   { color: var(--fort);  border-color: rgba(224,64,251,0.3); }
+
+  .tw-empty { padding: 12px 10px; border: 1px dashed var(--border); font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  .tw-summary-bar { display: flex; gap: 1px; margin-top: 16px; height: 3px; border-radius: 2px; overflow: hidden; }
+  .tw-summary-seg { height: 100%; }
+
+  /* Trigger */
+  .card.trigger { border-color: rgba(255,61,87,0.2); background: rgba(255,61,87,0.03); }
+  .trigger-inner { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+  .trigger-left { text-align: center; }
+  .trigger-left .ti { font-size: 30px; margin-bottom: 6px; display: block; }
+  .trigger-left p { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: var(--red); text-transform: uppercase; }
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .t-item { background: rgba(255,61,87,0.06); border: 1px solid rgba(255,61,87,0.15); padding: 13px; font-family: 'Space Mono', monospace; font-size: 10px; line-height: 1.6; }
+  .t-item::before { content: '⚡'; display: block; margin-bottom: 7px; font-size: 13px; }
+  .convergence-warning { margin-top: 12px; padding: 10px 14px; border: 1px solid rgba(255,61,87,0.25); background: rgba(255,61,87,0.05); font-family: 'Space Mono', monospace; font-size: 10px; line-height: 1.6; color: var(--text); text-align: center; letter-spacing: 0.03em; }
+
+  footer { border-top: 1px solid var(--border); padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.1em; }
+
+  @keyframes fadeDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes ripple   { 0%,100% { transform: scale(1.4); opacity:0.3; } 50% { transform: scale(1.7); opacity:0.06; } }
+  @keyframes breathe  { 0%,100% { box-shadow: 0 0 10px var(--green); } 50% { box-shadow: 0 0 18px var(--green), 0 0 30px var(--green); } }
+  @keyframes blink    { 0%,100% { opacity:1; } 50% { opacity:0.15; } }
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="scanlines"></div>
+
+<header>
+  <div class="logo-wrap">
+    <div class="tower-mark"><div class="tower-dot"></div></div>
+    <div class="logo-text">
+      <h1>The Watchtower</h1>
+      <p>Signal Intelligence · Cross-Domain Scan · v2.3</p>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <div class="nav-pill" style="border-color:var(--green);color:var(--green);background:rgba(0,232,122,0.05);">All Channels</div>
+    <div class="nav-pill">AI/Biotech</div>
+    <div class="nav-pill">Governance</div>
+    <div class="nav-pill">Neuro/Psych</div>
+    <div class="nav-pill" style="color:var(--fort);border-color:rgba(224,64,251,0.3);">⟁ Fortean</div>
+    <div class="nav-pill">Synthesis</div>
+  </nav>
+  <div class="header-right">
+    <div class="live-indicator"><div class="live-dot"></div>SCANNING</div>
+    <div class="clock" id="clock">—</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Update banner -->
+  <div class="update-banner">
+    <div class="update-banner-dot"></div>
+    <p>DUAL-SCAN UPDATE · v2.3 <span>· Apr 4 + Apr 5 2026 signals integrated · All channels confirming acceleration · ⟁ W1 Bledsoe window expired — scored UNRESOLVED</span></p>
+  </div>
+
+  <!-- Dual scan indicator -->
+  <div class="dual-scan">
+    <div class="scan-day">
+      <div class="scan-dot"></div>
+      <div class="scan-info">
+        <div class="scan-date">APR 04 2026 — SCAN 1</div>
+        <div class="scan-status">Integrated · Baseline established</div>
+      </div>
+    </div>
+    <div class="scan-day active">
+      <div class="scan-dot"></div>
+      <div class="scan-info">
+        <div class="scan-date">APR 05 2026 — SCAN 2 · CURRENT</div>
+        <div class="scan-status">↑ All signals confirmed · Convergence deepening · W1 expired</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sensor bar -->
+  <div class="sensor-bar">
+    <div class="sensor-left">
+      <div class="sensor-label">Signal Source</div>
+      <div class="sensor-name">⬡ ChatGPT Sensor Array</div>
+    </div>
+    <div class="sensor-nodes">
+      <div class="sensor-node"><div class="sensor-node-dot node-gpt"></div>ChatGPT · Pattern Detection</div>
+      <div class="sensor-node"><div class="sensor-node-dot node-will"></div>Will · Curation + Judgment</div>
+      <div class="sensor-node"><div class="sensor-node-dot node-claude"></div>Claude · Visualization</div>
+    </div>
+    <div class="sensor-format">Format: Timestamp · Event · Category · Strength · Time Window · Notes</div>
+  </div>
+
+  <!-- Status strip -->
+  <div class="status-strip">
+    <div class="stat-cell">
+      <div class="stat-label">Active Channels</div>
+      <div class="stat-val" style="color:var(--green)">5</div>
+      <div class="stat-sub">All confirming <span class="d-up">↑ LOCKED IN</span></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Overall Signal</div>
+      <div class="stat-val" style="color:var(--green)">HIGH+</div>
+      <div class="stat-sub">2-day confirmation <span class="d-up">↑ STRENGTHENING</span></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Convergence Depth</div>
+      <div class="stat-val" style="color:var(--blue)">3°+</div>
+      <div class="stat-sub">Unified platform forming <span class="d-up">↑ ACCELERATING</span></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Escalation Triggers</div>
+      <div class="stat-val" style="color:var(--red)">3</div>
+      <div class="stat-sub">Closing in on T1+T2 <span class="d-warn">⚠ WATCH</span></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Fortean Index</div>
+      <div class="stat-val" style="color:var(--fort)">W1↓</div>
+      <div class="stat-sub">Window expired · Scored <span class="d-fort">⟁ UNRESOLVED</span></div>
+    </div>
+  </div>
+
+  <!-- Phase bar -->
+  <div class="phase-bar">
+    <div class="phase-step"><div class="phase-num">01</div><div class="phase-name">Experimentation</div></div>
+    <div class="phase-step"><div class="phase-num">02</div><div class="phase-name">Proof</div></div>
+    <div class="phase-step current"><div class="phase-num">03 · NOW</div><div class="phase-name">Structural Transition</div></div>
+    <div class="phase-step"><div class="phase-num">04</div><div class="phase-name">Full Convergence</div></div>
+    <div class="phase-step"><div class="phase-num">05</div><div class="phase-name">Regulated System Layer</div></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- GOV -->
+    <div class="card gov sig-medhigh">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">🧠</div>
+          <div>
+            <div class="card-name">AI Governance + Biosecurity</div>
+            <div class="card-sub">BINDING COMPLIANCE LAYER FORMING</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b amber on" style="height:8px"></div>
+            <div class="b amber on" style="height:11px"></div>
+            <div class="b amber on" style="height:15px"></div>
+            <div class="b amber on" style="height:19px"></div>
+            <div class="b amber on" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--amber)">HIGH</div>
+        </div>
+      </div>
+      <div class="delta confirm">↑↑ CONFIRMED + DEEPENING — voluntary → binding enforcement</div>
+      <div class="pattern">Governance crossing from aspirational frameworks into enforceable, system-level compliance — especially where AI intersects critical infrastructure, biology, and neural data</div>
+
+      <div class="sig-section-label">Apr 4 — Baseline</div>
+      <ul class="sigs">
+        <li>Governance becoming domain-specific: neural data, consent frameworks, biology</li>
+        <li>Enforced credibility frameworks for AI in regulated submissions</li>
+        <li>India AI Impact Summit 2026: deployment standards, real-world accountability</li>
+        <li>Pattern: governance no longer general-purpose — embedded, technical, sector-specific</li>
+      </ul>
+
+      <div class="sig-section-label">Apr 5 — Confirmed + Advancing</div>
+      <ul class="sigs">
+        <li class="new-today">Binding oversight mechanisms accelerating — voluntary frameworks being left behind</li>
+        <li class="new-today">Audit requirements for high-risk AI in healthcare and finance entering early adoption</li>
+        <li class="new-today">U.S., EU, and Asian regulators converging on model accountability and traceability standards</li>
+        <li class="new-today">AI now directly embedded in FDA submissions and clinical trial design</li>
+      </ul>
+    </div>
+
+    <!-- BIO -->
+    <div class="card bio sig-high">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">🧬</div>
+          <div>
+            <div class="card-name">AI-Native Biotech</div>
+            <div class="card-sub">SOFTWARE-LIKE DEVELOPMENT CYCLES EMERGING</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b green on" style="height:8px"></div>
+            <div class="b green on" style="height:11px"></div>
+            <div class="b green on" style="height:15px"></div>
+            <div class="b green on" style="height:19px"></div>
+            <div class="b green on" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--green)">HIGH</div>
+        </div>
+      </div>
+      <div class="delta confirm">↑↑ CONFIRMED — pharma outsourcing core discovery to AI-native systems</div>
+      <div class="pattern">Drug development shifting from hypothesis-driven experimentation to parallelized, computation-led ecosystems — biology becoming computable infrastructure</div>
+
+      <div class="sig-section-label">Apr 4 — Baseline</div>
+      <ul class="sigs">
+        <li>Eli Lilly expanding AI-driven discovery partnerships ~$2.7B — pharma no longer experimenting</li>
+        <li>Closed-loop "design → test → refine" systems: full simulation before trials</li>
+        <li>Biotech transitioning to AI-operated infrastructure, not AI-assisted research</li>
+      </ul>
+
+      <div class="sig-section-label">Apr 5 — Confirmed + Advancing</div>
+      <ul class="sigs">
+        <li class="new-today">Multiple AI-first candidates entering preclinical + early clinical stages simultaneously</li>
+        <li class="new-today">In silico biology: compounds designed + filtered almost entirely computationally before lab</li>
+        <li class="new-today">AI-designed proteins and gene therapies approaching human trials</li>
+        <li class="new-today">Development cycles increasingly resembling software engineering, not traditional science</li>
+      </ul>
+    </div>
+
+    <!-- EMTECH -->
+    <div class="card emtech sig-emtech">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">🤖</div>
+          <div>
+            <div class="card-name">Emerging Tech Convergence</div>
+            <div class="card-sub">CLOSED-LOOP R&D INFRASTRUCTURE FORMING</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b cyan on" style="height:8px"></div>
+            <div class="b cyan on" style="height:11px"></div>
+            <div class="b cyan on" style="height:15px"></div>
+            <div class="b cyan on" style="height:19px"></div>
+            <div class="b cyan on" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--cyan)">HIGH</div>
+        </div>
+      </div>
+      <div class="delta confirm">↑↑ CONFIRMED — TechBio stack solidifying as unified R&D layer</div>
+      <div class="pattern">AI + biotech + robotics + advanced materials converging into continuous, machine-driven R&D ecosystems — discrete human-led experimentation phases becoming optional</div>
+
+      <div class="sig-section-label">Apr 4 — Baseline</div>
+      <ul class="sigs">
+        <li>BioAsia 2026: "TechBio" framing — AI + biology as single unified stack</li>
+        <li>AI agents planning experiments, autonomous labs executing them</li>
+        <li>Integrated data-to-therapy pipelines emerging</li>
+      </ul>
+
+      <div class="sig-section-label">Apr 5 — Confirmed + Advancing</div>
+      <ul class="sigs">
+        <li class="new-today">Convergence across AI, robotics, biotech, advanced materials — all strengthening simultaneously</li>
+        <li class="new-today">Autonomous research systems: AI designs → robotic labs execute → feedback loops refine</li>
+        <li class="new-today">Closed-loop innovation systems moving from concept to early infrastructure</li>
+        <li class="new-today">Human-led experimentation phases reducing — machine-driven cycles taking over</li>
+      </ul>
+    </div>
+
+    <!-- PSYCH -->
+    <div class="card psych sig-high">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">🍄</div>
+          <div>
+            <div class="card-name">Psychedelic Research</div>
+            <div class="card-sub">BIFURCATION LOCKED — TWO DISTINCT INDUSTRIES</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b green on" style="height:8px"></div>
+            <div class="b green on" style="height:11px"></div>
+            <div class="b green on" style="height:15px"></div>
+            <div class="b green on" style="height:19px"></div>
+            <div class="b green on" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--green)">HIGH</div>
+        </div>
+      </div>
+      <div class="delta confirm">↑↑ CONFIRMED — split structural and accelerating on both tracks</div>
+      <div class="pattern">Field stabilizing into two distinct industries: regulated clinical psychedelic medicine vs. engineered non-hallucinogenic neuroplasticity compounds — divergence now irreversible</div>
+
+      <div class="sig-section-label">Apr 4 — Baseline</div>
+      <ul class="sigs">
+        <li>Multiple companies in Phase 3 trials — late-stage, near approval</li>
+        <li>FDA progression of inhaled psychedelic treatments for depression</li>
+        <li>Delix Therapeutics: explicitly developing "no-trip" neuroplasticity drugs</li>
+        <li>Increased scrutiny on marketing, clinical claims, commercialization ethics</li>
+      </ul>
+
+      <div class="sig-section-label">Apr 5 — Confirmed + Stabilizing</div>
+      <ul class="sigs">
+        <li class="new-today">Late-stage clinical progress continuing — regulatory positioning becoming more structured</li>
+        <li class="new-today">Strong pivot toward precision-targeted neuroplasticity compounds</li>
+        <li class="new-today">Institutional involvement growing: health systems + insurers preparing for scaled rollout</li>
+        <li class="new-today">Track 1 (regulated medicine) and Track 2 (engineered neuro-modulators) now operating independently</li>
+      </ul>
+    </div>
+
+    <!-- NEURO -->
+    <div class="card neuro sig-medium">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">🔬</div>
+          <div>
+            <div class="card-name">Neuro + Mental Health Tech</div>
+            <div class="card-sub">THREE-TRACK MODEL CONFIRMED — PSYCH FEED INCOMING</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b blue on" style="height:8px"></div>
+            <div class="b blue on" style="height:11px"></div>
+            <div class="b blue on" style="height:15px"></div>
+            <div class="b blue on" style="height:19px"></div>
+            <div class="b" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--blue)">MED–HIGH</div>
+        </div>
+      </div>
+      <div class="delta shift">⇢ ELEVATED — psych Track 2 compounds feeding directly into this channel</div>
+      <div class="pattern">Mental health treatment splitting into three parallel modalities — and psychedelic Track 2 (engineered neuroactives) is now actively cross-loading into this channel</div>
+      <ul class="sigs">
+        <li>Neuroplastogens: psychedelic-like benefits without hallucinations — crossing from psych into neuro</li>
+        <li>Brain-interface therapies: deep brain stimulation expansion continuing</li>
+        <li>Glymphatic targeting + sleep-based cognitive therapies</li>
+        <li class="new-today">Neurotech bifurcation confirmed: experiential therapies vs. engineered cognition tools</li>
+        <li class="new-today">Non-hallucinogenic compounds now a bridge between psychedelic and neuro channels</li>
+      </ul>
+    </div>
+
+    <!-- FORTEAN -->
+    <div class="card fort sig-fort">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">⟁</div>
+          <div>
+            <div class="card-name" style="color:var(--fort)">Fortean Anomaly Monitor</div>
+            <div class="card-sub" style="color:rgba(224,64,251,0.5)">PARALLEL CHANNEL · PATTERN NOT TRUTH · W1 EXPIRED · SCORED</div>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="meter-label">SIGNAL</div>
+          <div class="bars">
+            <div class="b fort on" style="height:8px"></div>
+            <div class="b" style="height:11px"></div>
+            <div class="b" style="height:15px"></div>
+            <div class="b" style="height:19px"></div>
+            <div class="b" style="height:23px"></div>
+          </div>
+          <div class="meter-val" style="color:var(--fort)">LOW · W1 CLOSED</div>
+        </div>
+      </div>
+      <div class="delta score">⟁ W1 SCORED — Bledsoe Easter window expired Apr 5 · Verdict: UNRESOLVED</div>
+      <div class="pattern" style="border-color:var(--fort)">"Keep the data — especially the data that doesn't fit." — Charles Fort</div>
+
+      <div class="fort-cols">
+        <div>
+          <div class="fort-col-label">What We Track</div>
+          <ul class="sigs">
+            <li>Unexplained aerial phenomena — non-military, non-obvious</li>
+            <li>Animal anomalies — mass die-offs, behavioral deviations</li>
+            <li>Atmospheric oddities — lights, sounds, artifacts</li>
+            <li>Physical anomalies across multiple independent witnesses</li>
+            <li>Recurring cross-location pattern reports</li>
+          </ul>
+        </div>
+        <div>
+          <div class="fort-col-label">What We Filter Out</div>
+          <ul class="sigs" style="color:var(--muted2)">
+            <li>Single-source anecdotal reports — below multi-witness bar</li>
+            <li>Obvious hoaxes or high-memetic viral noise</li>
+            <li>Explainable by known phenomena</li>
+            <li>Truth claims — we track pattern, not belief</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- W1 Scored -->
+      <div class="watch-scored">
+        <div class="watch-scored-label">
+          ⟁ W1 CLOSED <span>SCORED · APR 5 2026</span>
+        </div>
+        <div class="watch-scored-entry">
+          <strong style="color:#fff;">Bledsoe Easter 2026 Prediction</strong> — Chris Bledsoe (multi-witness 2007 UAP case, CIA officer attention on record) via single Threads thread (georgie_bartholemew). Prediction from 2012: orbs rising from oceans, Iran–Israel conflict trigger, Regulus/Sphinx astronomical alignment — all allegedly converging on Easter 2026 window.<br><br>
+          Expiry date reached: April 5, 2026 (Easter). Prediction has not come to pass as of scoring time. No corroborating reports of claimed events. No secondary sources confirming any element of the prediction.
+        </div>
+        <div class="watch-scored-verdict">
+          VERDICT: UNRESOLVED — window elapsed without confirmation or falsification of specific claims. Prediction neither clearly manifested nor definitively impossible to assess. Status: inconclusive.
+        </div>
+        <div class="watch-scored-note">
+          Note: "Unresolved" is the honest score here. The specific claims (orbs, geopolitical trigger, astronomical alignment) did not produce observable confirmation. However, the underlying Bledsoe case retains independent cross-source weight — former CIA Senior Intelligence Officer Jim Semivan's public vouching remains anomalous institutional behavior worth carrying forward as a separate data point, unconnected to this prediction's outcome.
+        </div>
+      </div>
+
+      <div class="fort-protocol">
+        <div class="fort-protocol-label">⟁ Protocol</div>
+        <div class="fort-rule"><span>01</span>Track recurrence and similarity — not truth claims</div>
+        <div class="fort-rule"><span>02</span>Log: "This type of report is appearing again" — not "this is real"</div>
+        <div class="fort-rule"><span>03</span>Flag when Fortean topics enter mainstream discourse (narrative drift)</div>
+        <div class="fort-tags">
+          <div class="fort-tag">↔ Environmental</div>
+          <div class="fort-tag">↔ Infrastructure</div>
+          <div class="fort-tag">↔ Narrative Drift</div>
+          <div class="fort-tag">↔ Aviation Anomalies</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMPORAL ACTIVITY MAP -->
+    <div class="card temporal sig-temporal">
+      <div class="card-top">
+        <div class="card-id">
+          <div class="card-icon">⏱</div>
+          <div>
+            <div class="card-name">Temporal Activity Map</div>
+            <div class="card-sub">2-DAY PATTERN WINDOW · APR 4–5 · ALL CHANNELS PERSISTENT</div>
+          </div>
+        </div>
+        <div class="delta confirm" style="margin-bottom:0;">↑↑ Cross-scan confirmation — signals deepening not drifting</div>
+      </div>
+
+      <div class="temporal-grid">
+
+        <!-- PERSISTENT -->
+        <div class="tw-col persistent">
+          <div class="tw-header">
+            <div class="tw-header-label">Persistent</div>
+            <div class="tw-header-title" style="color:var(--red)">Ongoing · 2-Day Confirmed</div>
+            <div class="tw-header-desc">Appeared in both scans. Pattern locked. Watch for escalation.</div>
+          </div>
+          <div class="tw-signals">
+            <div class="tw-signal bio">
+              <div class="tw-sig-cat bio">AI-Native Biotech</div>
+              <div class="tw-sig-event">AI-operated pipeline infrastructure confirmed both days — Eli Lilly $2.7B + in silico biology expansion</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength bio">HIGH</span>
+                <span class="tw-window-tag">APR 4 + APR 5</span>
+              </div>
+            </div>
+            <div class="tw-signal gov">
+              <div class="tw-sig-cat gov">AI Governance</div>
+              <div class="tw-sig-event">Voluntary → binding shift confirmed both days — audit requirements and cross-regulator alignment advancing</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength gov">HIGH</span>
+                <span class="tw-window-tag">APR 4 + APR 5</span>
+              </div>
+            </div>
+            <div class="tw-signal emtech">
+              <div class="tw-sig-cat emtech">Emtech Convergence</div>
+              <div class="tw-sig-event">Closed-loop R&D systems confirmed both days — TechBio stack + autonomous robotic labs</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength emtech">HIGH</span>
+                <span class="tw-window-tag">APR 4 + APR 5</span>
+              </div>
+            </div>
+            <div class="tw-signal psych">
+              <div class="tw-sig-cat psych">Psychedelic Research</div>
+              <div class="tw-sig-event">Bifurcation into two tracks confirmed both days — Phase 3 progression + no-trip compound development</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength psych">HIGH</span>
+                <span class="tw-window-tag">APR 4 + APR 5</span>
+              </div>
+            </div>
+            <div class="tw-signal neuro">
+              <div class="tw-sig-cat neuro">Neuro + Mental Health</div>
+              <div class="tw-sig-event">Three-track model holding — psych Track 2 compounds now crossing into neuro channel</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength neuro">MED–HIGH</span>
+                <span class="tw-window-tag">APR 4 + APR 5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MULTI-DAY -->
+        <div class="tw-col multiday">
+          <div class="tw-header">
+            <div class="tw-header-label">Multi-Day</div>
+            <div class="tw-header-title" style="color:var(--amber)">Clustering · Evolving</div>
+            <div class="tw-header-desc">Pattern building across days. Watch for persistence.</div>
+          </div>
+          <div class="tw-signals">
+            <div class="tw-signal bio">
+              <div class="tw-sig-cat bio">AI-Native Biotech</div>
+              <div class="tw-sig-event">Protein + gene therapy candidates moving toward human trials — sequence of signals over 48hrs</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength bio">HIGH</span>
+                <span class="tw-window-tag">MULTI-DAY</span>
+              </div>
+            </div>
+            <div class="tw-signal gov">
+              <div class="tw-sig-cat gov">AI Governance</div>
+              <div class="tw-sig-event">International regulatory alignment consolidating — U.S./EU/Asia convergence signals clustering</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength gov">MED–HIGH</span>
+                <span class="tw-window-tag">MULTI-DAY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAME-DAY -->
+        <div class="tw-col sameday">
+          <div class="tw-header">
+            <div class="tw-header-label">Same-Day</div>
+            <div class="tw-header-title" style="color:var(--cyan)">Clustering · Apr 5</div>
+            <div class="tw-header-desc">Multiple signals within single scan window.</div>
+          </div>
+          <div class="tw-signals">
+            <div class="tw-signal emtech">
+              <div class="tw-sig-cat emtech">Emtech Convergence</div>
+              <div class="tw-sig-event">AI + robotics + biotech + advanced materials — four-domain convergence confirmed in single Apr 5 scan</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength emtech">HIGH</span>
+                <span class="tw-window-tag">APR 5</span>
+              </div>
+            </div>
+            <div class="tw-signal psych">
+              <div class="tw-sig-cat psych">Psychedelic Research</div>
+              <div class="tw-sig-event">Institutional investor/insurer preparation for scaled rollout — new signal appearing alongside Phase 3 news</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength psych">HIGH</span>
+                <span class="tw-window-tag">APR 5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IMMEDIATE -->
+        <div class="tw-col immediate">
+          <div class="tw-header">
+            <div class="tw-header-label">Immediate</div>
+            <div class="tw-header-title" style="color:var(--muted2)">Isolated · Scored</div>
+            <div class="tw-header-desc">Single events. W1 now scored and closed.</div>
+          </div>
+          <div class="tw-signals">
+            <div class="tw-signal fort">
+              <div class="tw-sig-cat fort">⟁ Fortean · W1 CLOSED</div>
+              <div class="tw-sig-event">Bledsoe Easter 2026 prediction window expired Apr 5. Specific claims did not manifest. Scored UNRESOLVED.</div>
+              <div class="tw-sig-meta">
+                <span class="tw-sig-strength fort">SCORED</span>
+                <span class="tw-window-tag">IMMEDIATE · CLOSED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Summary bar — all persistent now -->
+      <div class="tw-summary-bar">
+        <div class="tw-summary-seg" style="flex:5; background:var(--red); opacity:0.65;"></div>
+        <div class="tw-summary-seg" style="flex:2; background:var(--amber); opacity:0.5;"></div>
+        <div class="tw-summary-seg" style="flex:2; background:var(--cyan); opacity:0.45;"></div>
+        <div class="tw-summary-seg" style="flex:1; background:var(--muted); opacity:0.3;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:5px; font-family:'Space Mono',monospace; font-size:7px; color:var(--muted); letter-spacing:0.12em;">
+        <span style="color:rgba(255,61,87,0.7)">■ PERSISTENT (5)</span>
+        <span style="color:rgba(245,166,35,0.6)">■ MULTI-DAY (2)</span>
+        <span style="color:rgba(0,212,255,0.6)">■ SAME-DAY (2)</span>
+        <span style="color:rgba(93,112,128,0.5)">■ IMMEDIATE (1 · scored)</span>
+      </div>
+    </div>
+
+    <!-- SYNTHESIS -->
+    <div class="card synth sig-synth">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px">🔗</span>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#fff;">Cross-Domain Synthesis</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:0.1em;">2-DAY CONFIRMATION · ALL META-PATTERNS STRENGTHENING</div>
+          </div>
+        </div>
+        <div class="delta confirm" style="margin:0;">↑↑ STRUCTURE CONFIRMED ACROSS TWO SCANS</div>
+      </div>
+      <div class="synth-inner">
+        <div class="synth-col">
+          <h4>1st Order — Locked</h4>
+          <div class="order">
+            <div class="order-n">01</div>
+            <div>
+              <div class="order-t">Biology Is Computable</div>
+              <div class="order-d">Drug discovery running like software. Parallelized computation-led development confirmed both days. In silico biology replacing hypothesis-driven research.</div>
+            </div>
+          </div>
+        </div>
+        <div class="synth-col">
+          <h4>2nd Order — Locked</h4>
+          <div class="order">
+            <div class="order-n">02</div>
+            <div>
+              <div class="order-t">AI Is Regulated Infrastructure</div>
+              <div class="order-d">Not just tools — embedded systems subject to audits, validation, and domain rules. Governance inside the stack, not watching from outside it.</div>
+            </div>
+          </div>
+        </div>
+        <div class="synth-col">
+          <h4>3rd Order — Confirmed</h4>
+          <div class="order">
+            <div class="order-n">03</div>
+            <div>
+              <div class="order-t">Neurotech Splitting In Two</div>
+              <div class="order-d">Experiential therapies (regulated psychedelics) and engineered cognition tools (non-hallucinogenic compounds) now operating as separate industries with separate trajectories.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-num">A</div>
+          <div class="meta-title">Accelerating</div>
+          <div class="meta-desc">AI-biotech pipelines, closed-loop R&D, cross-regulator compliance convergence — all moving faster than Apr 4 baseline</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-num">E</div>
+          <div class="meta-title">Emerging</div>
+          <div class="meta-desc">AI-designed gene therapies approaching human trials, autonomous robotic labs, institutional psych rollout preparation</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-num">S</div>
+          <div class="meta-title">Stabilizing</div>
+          <div class="meta-desc">Psychedelic field split now structural and confirmed — both tracks operating independently with separate funding, timelines, and endpoints</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIGGERS -->
+    <div class="card trigger sig-trigger">
+      <div class="trigger-inner">
+        <div class="trigger-left">
+          <span class="ti">🔭</span>
+          <p>Escalation<br>Triggers</p>
+          <br>
+          <p style="color:var(--muted);font-size:8px;">0 / 3 FIRED</p>
+          <br>
+          <p style="color:var(--amber);font-size:8px;">T1 + T2<br>CLOSING</p>
+        </div>
+        <div>
+          <div class="trigger-grid">
+            <div class="t-item" style="border-color:rgba(255,61,87,0.3);background:rgba(255,61,87,0.09);">
+              First FDA approval of a psilocybin-based therapy — Phase 3 progression confirmed. Getting closer. Watch for NDA filing as leading indicator.
+            </div>
+            <div class="t-item" style="border-color:rgba(255,61,87,0.3);background:rgba(255,61,87,0.09);">
+              AI-designed drug reaching late-stage success — in silico biology + AI-designed proteins approaching human trials. This trigger is within sight.
+            </div>
+            <div class="t-item">Formal regulatory framework targeting AI-driven synthetic biology — governance embedding but no synthetic bio–specific framework yet</div>
+          </div>
+          <div class="convergence-warning">
+            IF ALL 3 FIRE → Full convergence of AI · Biotech · Neuro-modulation into a single regulated system layer
+            <span style="color:var(--fort);margin-left:12px;">⟁ Fortean index behavior at full convergence: UNKNOWN · W1 closed · Channel reset</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div>THE WATCHTOWER v2.3 · SIGNAL INTELLIGENCE · APR 4–5 2026</div>
+  <div>⬡ ChatGPT Sensor Array · Will · Claude · AI · BIOTECH · NEURO · PSYCH · EMTECH · ⟁ FORTEAN</div>
+  <div id="foot-clock">—</div>
+</footer>
+
+<script>
+  function tick() {
+    const s = new Date().toLocaleString('en-US', {
+      weekday:'short', month:'short', day:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+    document.getElementById('clock').textContent = s;
+    document.getElementById('foot-clock').textContent = s;
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
